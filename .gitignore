@@ -1,3 +1,7 @@
+# Additions to the Python template
+mlruns/
+tmp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
