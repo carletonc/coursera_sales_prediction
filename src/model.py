@@ -7,7 +7,10 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, m
 
 
 
-def get_data(path='tmp/data/train.pkl'):
+def get_data(path='data/train.pkl'):
+    """
+    Split data in to train & validation sets.
+    """
     if isinstance(path, str):
         TRAIN = pd.read_pickle(path).fillna(0)
     elif isinstance(path, pd.DataFrame):
@@ -25,14 +28,17 @@ def get_data(path='tmp/data/train.pkl'):
 
 
 
-def train_experiment(X_train, y_train, pipeline, params, n_experiments=5, random_state=42):
+def train_experiment(X_train, y_train, pipeline, params, n_experiments=5, n_jobs=-1, random_state=42, scoring='neg_mean_squared_error'):
+    """
+    Run an experiment to traina model.
+    """
     search = RandomizedSearchCV(pipeline, 
                                 param_distributions=params, 
                                 n_iter=n_experiments,
                                 cv=5, 
-                                scoring='neg_mean_squared_error',
+                                scoring=scoring,
                                 refit=True,
-                                n_jobs=-1,
+                                n_jobs=n_jobs,
                                 random_state=random_state)
     search.fit(X_train, y_train)
     
@@ -43,6 +49,9 @@ def train_experiment(X_train, y_train, pipeline, params, n_experiments=5, random
 
 
 def regression_report(target, prediction, name=None):
+    """
+    Retrieve train & validation scores.
+    """
     mse = mean_squared_error(target, prediction)
     rmse = mean_squared_error(target, prediction, squared=False)
     mae = mean_absolute_error(target, prediction)
@@ -56,7 +65,7 @@ def regression_report(target, prediction, name=None):
         print()
     print('\t\tMean Squared Error: \t\t', mse)
     print('\t\tRoot Mean Squared Error: \t', rmse)
-    print('\t\tMean Absolute Error: \t\t', mae)
+    #print('\t\tMean Absolute Error: \t\t', mae)
     print('\t\tR2: \t\t\t\t', r2)
     #print('\t\tR2 Adjusted: \t\t\t', r2_adj)
     #print('\t\tMax Error: \t\t\t', max_er)
@@ -65,6 +74,9 @@ def regression_report(target, prediction, name=None):
 
 
 def log_experiment(pipeline, train_report, val_report):
+    """
+    Log model parameters and scors.
+    """
     with mlflow.start_run():
         pipeline_steps = pipeline.named_steps
         pipeline_step_keys = list(pipeline_steps.keys())
@@ -75,25 +87,30 @@ def log_experiment(pipeline, train_report, val_report):
 
         mlflow.log_metric('train_mse', train_report[0])
         mlflow.log_metric('train_rmse', train_report[1])
-        mlflow.log_metric('train_mae', train_report[2])
+        #mlflow.log_metric('train_mae', train_report[2])
         mlflow.log_metric('train_r2', train_report[3])
         #mlflow.log_metric('train_r2_adj', train_report[4])
         #mlflow.log_metric('train_max_error', train_report[5])
 
         mlflow.log_metric('val_mse', val_report[0])
         mlflow.log_metric('val_rmse', val_report[1])
-        mlflow.log_metric('val_mae', val_report[2])
+        #mlflow.log_metric('val_mae', val_report[2])
         mlflow.log_metric('val_r2', val_report[3])
         #mlflow.log_metric('val_r2_adj', val_report[4])
         #mlflow.log_metric('val_max_error', val_report[5])
 
         mlflow.sklearn.log_model(pipeline, "model")
-    
-    
-def run_experiment(data, pipeline, params, n_experiments):
+    return
+
+
+
+def run_experiment(data, pipeline, params, n_experiments, n_jobs, random_state, scoring):
+    """
+    Run complete experiment pipeline.
+    """
     X_train, y_train, X_val, y_val = data
     # train model
-    search = train_experiment(X_train, y_train, pipeline, params, n_experiments=n_experiments)
+    search = train_experiment(X_train, y_train, pipeline, params, n_experiments, n_jobs, random_state, scoring)
     best_pipeline = search.best_estimator_
     # best_pipeline is already re-fit, we dont need to fit again
     # best_pipeline.fit(X_train, y_train) 
@@ -108,10 +125,13 @@ def run_experiment(data, pipeline, params, n_experiments):
     
     log_experiment(best_pipeline, train_report, val_report)
     return
-    
+
 
     
 def main(pipeline=None, params=None, n_experiments=None, pipelines=None):
+    """
+    Placeholder to run an experiment in terminal.
+    """
     # get data
     data = get_data()
     
@@ -122,8 +142,6 @@ def main(pipeline=None, params=None, n_experiments=None, pipelines=None):
             n_experiments = model['n_experiments']
             
             run_experiment(data, pipeline, params, n_experiments)
-        return
-            
     else:
         run_experiment(data, pipeline, params, n_experiments)
-        return
+    return
