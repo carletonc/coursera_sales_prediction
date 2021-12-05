@@ -3,7 +3,14 @@
  - [Coursera Class](https://www.coursera.org/learn/competitive-data-science)
  
 ## Intro/Objective
-I have not taken the coursera course yet, this is self-driven project to experiment with time series prediction, feature engineering, and to familiarize myself with various models and hyperparameter optimization.
+I have not taken the coursera course yet; this is self-driven project to experiment with time series forecasting, time series feature engineering, and familiarize myself with various models and hyperparameter optimization. Models tested will start with common sklearn methods, then timeseries train/validation splits, and eventually move to libraries/toolings I'm less familiar with (Prophet, ARIMA, etc).
+
+Current Models:
+- Lasso Regression
+- Ridge Regression
+- Elastic Net Regression
+- SGD Regression
+- Random Forests
 
 ## Directories
 - data - contains 3 sub-directories for data transformations: raw, processed, and final.
