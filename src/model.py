@@ -7,7 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, m
 
 
 
-def get_data(path='tmp/data/train.pkl'):
+def get_data(path='data/train.pkl'):
     """
     Split data in to train & validation sets.
     """

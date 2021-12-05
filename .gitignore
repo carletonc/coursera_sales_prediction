@@ -1,6 +1,7 @@
 # Additions to the Python template
 mlruns/
 tmp/
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
